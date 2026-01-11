@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skin Cancer Classification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <i class="fas fa-microscope"></i>
+            <h1>SkinScan AI</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/" class="active">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="#" id="open-chat-btn"><i class="fas fa-file-medical-alt"></i> Summary Report</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h2>Skin Cancer Detection Using AI</h2>
+                <p>Upload skin lesion images for instant analysis using our advanced EfficientNetB4 model</p>
+                <button id="start-scan-btn" class="btn primary-btn">Start Scanning</button>
+            </div>
+            <div class="hero-image">
+                <img src="{{ url_for('static', filename='img/hero-image.jpg') }}" alt="Skin cancer detection illustration">
+            </div>
+        </section>
+
+        <section id="upload-section" class="upload-section">
+            <h2>Upload Images</h2>
+            <p>Upload 1-200 images of skin lesions for analysis</p>
+            
+            <div class="upload-container">
+                <div id="drop-area">
+                    <form class="upload-form">
+                        <input type="file" id="fileInput" multiple accept="image/*" class="file-input">
+                        <label for="fileInput" class="file-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Drag & drop images or click to browse</span>
+                        </label>
+                    </form>
+                    <div id="gallery" class="gallery"></div>
+                </div>
+                
+                <div class="upload-controls">
+                    <div class="file-count">
+                        <span id="selected-count">0</span> files selected
+                    </div>
+                    <button id="clear-btn" class="btn secondary-btn" disabled>Clear All</button>
+                    <button id="analyze-btn" class="btn primary-btn" disabled>Analyze Images</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="results-section" class="results-section hidden">
+            <h2>Analysis Results</h2>
+            <div class="results-summary">
+                <div class="summary-item">
+                    <i class="fas fa-images"></i>
+                    <span id="total-images">0</span>
+                    <p>Images Analyzed</p>
+                </div>
+                <div class="summary-item">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span id="high-risk">0</span>
+                    <p>High Risk Detected</p>
+                </div>
+                <div class="summary-item">
+                    <i class="fas fa-clock"></i>
+                    <span id="avg-time">0</span>
+                    <p>Avg. Processing Time</p>
+                </div>
+            </div>
+            
+            <div class="results-controls">
+                <div class="search-filter">
+                    <input type="text" id="search-results" placeholder="Search results...">
+                    <select id="filter-results">
+                        <option value="all">All Results</option>
+                        <option value="high-risk">High Risk Only</option>
+                        <option value="low-risk">Low Risk Only</option>
+                    </select>
+                </div>
+                <button id="export-btn" class="btn secondary-btn">Export Results</button>
+            </div>
+            
+            <div class="results-container">
+                <div id="results-loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing images...</p>
+                </div>
+                <div id="results-grid" class="results-grid"></div>
+            </div>
+
+            <div class="results-actions">
+                <button id="view-summary-btn" class="btn primary-btn">
+                    <i class="fas fa-file-medical-alt"></i> View Summary Report
+                </button>
+                <button id="back-btn" class="btn secondary-btn">Back to Upload</button>
+            </div>
+        </section>
+    </main>
+
+    <div id="detail-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Detailed Analysis</h2>
+            <div class="modal-body">
+                <div class="detail-image">
+                    <img id="detail-img" src="/placeholder.svg" alt="Lesion image">
+                </div>
+                <div class="detail-info">
+                    <h3 id="detail-diagnosis"></h3>
+                    <div class="detail-confidence">
+                        <span>Confidence:</span>
+                        <div class="progress-bar">
+                            <div id="confidence-bar" class="progress"></div>
+                        </div>
+                        <span id="confidence-value"></span>
+                    </div>
+                    <div class="detail-risk">
+                        <span>Risk Level:</span>
+                        <span id="risk-level" class="risk-badge"></span>
+                    </div>
+                    <div class="detail-description">
+                        <h4>Description:</h4>
+                        <p id="description-text"></p>
+                    </div>
+                    <div class="detail-chart">
+                        <h4>Visualization:</h4>
+                        <img id="detail-chart" src="/placeholder.svg" alt="Prediction visualization">
+                    </div>
+                    <button id="ask-ai-btn" class="btn primary-btn">
+                        <i class="fas fa-comment-medical"></i> Ask AI Assistant
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chatbot Modal -->
+    <div id="chatbot-modal" class="modal">
+        <div class="chatbot-content">
+            <div class="chatbot-header">
+                <h3><i class="fas fa-file-medical-alt"></i> Analysis Summary Report</h3>
+                <span class="close-chatbot">&times;</span>
+            </div>
+            <div class="chatbot-messages" id="chatbot-messages">
+                <div class="message bot-message">
+                    <div class="message-content">
+                        <p>Loading summary report...</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Remove the chat input and suggestions since this is now a report view -->
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-microscope"></i>
+                <h3>SkinScan AI</h3>
+            </div>
+            <div class="footer-disclaimer">
+                <p><strong>Disclaimer:</strong> This tool is for educational purposes only and should not replace professional medical advice. Always consult with a healthcare professional for proper diagnosis.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 SkinScan AI. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+</body>
+</html>
+
