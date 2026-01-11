@@ -10,3 +10,4 @@ gdown>=4.2.0
 opencv-python>=4.5.3
 albumentations>=1.0.3
 tqdm>=4.62.0
+gunicorn
